@@ -3,18 +3,26 @@ import SnapKit
 import UIKit
 
 protocol HomeViewLogic: UIView {
-    func getTitle() -> UILabel
+    func getTableView() -> UITableView
+    func getIndicator() -> UIActivityIndicatorView
 }
 
 final class HomeView: UIView {
     
     // MARK: - Views
     
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .white
-        label.font = UIFont.systemFont(ofSize: 56)
-        return label
+    private lazy var tableView: UITableView = {
+       let tableView = UITableView()
+        tableView.register(NewsCell.self, forCellReuseIdentifier: NewsCell.cellID)
+        tableView.backgroundColor = .white
+        tableView.rowHeight = 250
+        return tableView
+    }()
+    
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
     }()
     
     //
@@ -33,17 +41,23 @@ final class HomeView: UIView {
     // MARK: - Private Methods
     
     private func configure() {
-        backgroundColor = .red
+        backgroundColor = .white
         addSubviews()
         addConstraints()
     }
     
     private func addSubviews() {
-        addSubview(titleLabel)
+        addSubview(tableView)
+        addSubview(activityIndicator)
     }
     
     private func addConstraints() {
-        titleLabel.snp.makeConstraints { (make) in
+        tableView.snp.makeConstraints { (make) in
+            make.top.equalToSuperview()
+            make.bottom.equalToSuperview()
+            make.leading.trailing.equalToSuperview()
+        }
+        activityIndicator.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
     }
@@ -52,7 +66,10 @@ final class HomeView: UIView {
 // MARK: - ProfileViewLogic
 
 extension HomeView: HomeViewLogic {
-    func getTitle() -> UILabel {
-        return titleLabel
+    func getTableView() -> UITableView {
+        return tableView
+    }
+    func getIndicator() -> UIActivityIndicatorView {
+        return activityIndicator
     }
 }

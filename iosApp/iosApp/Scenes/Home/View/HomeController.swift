@@ -8,7 +8,12 @@ final class HomeController: UIViewController {
     
     lazy var contentView: HomeViewLogic = HomeView()
     private var viewModel = NewsAppSDK().viewModel.newsViewModel
-    internal var news: NewsResponse?
+    var articles: [Article] = [] {
+        didSet {
+            self.contentView.getIndicator().stopAnimating()
+            self.contentView.getTableView().reloadData()
+        }
+    }
     
     
     // MARK: - Private Properties
@@ -24,26 +29,31 @@ final class HomeController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
-        observeViewModel()
-        viewModel.getBreakingNews()
+        delegates()
+        observables()
+        getBreakingNews()
     }
     
     // MARK: - Requests
+    
+    private func getBreakingNews() {
+        viewModel.getBreakingNews()
+    }
     
     //
     
     // MARK: - Private Methods
     
-    private func observeViewModel() {
+    private func observables() {
         viewModel.mNewsListLiveData.addObserver { newsState in
             if (newsState is SuccessNewsListState) {
                 let successState = newsState as! SuccessNewsListState
                 let response = successState.response as! ResponseSuccess
-                let value = response.data as! NewsResponse
-                self.news = value
+                guard let value = response.data else {return}
+                self.articles = value.articles!
                 print("DEBUG: SUCCESS")
             } else if (newsState is LoadingNewsListState) {
-                print("DEBUG: LOADING")
+                self.contentView.getIndicator().startAnimating()
             } else if (newsState is ErrorNewsListState) {
                 print("DEBUG: ERROR")
             }
@@ -51,7 +61,12 @@ final class HomeController: UIViewController {
     }
     
     private func configure() {
-        contentView.getTitle().text = "TALA"
+        
+    }
+    
+    private func delegates() {
+        contentView.getTableView().delegate = self
+        contentView.getTableView().dataSource = self
     }
     
     // MARK: - UI Actions
@@ -61,5 +76,24 @@ final class HomeController: UIViewController {
     deinit {
         viewModel.onCleared()
     }
+}
+
+extension HomeController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return articles.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: NewsCell.cellID,
+                                                       for: indexPath) as? NewsCell else {return UITableViewCell()}
+        let item = articles[indexPath.row]
+        cell.setupData(data: item)
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+
 }
 
