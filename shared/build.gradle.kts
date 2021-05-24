@@ -38,7 +38,9 @@ kotlin {
             dependencies {
 
                 // MOKKO - MVVM
-                implementation("dev.icerock.moko:mvvm:0.10.1")
+                implementation("dev.icerock.moko:mvvm-core:0.10.1")
+                implementation("dev.icerock.moko:mvvm-livedata:0.10.1")
+                implementation("dev.icerock.moko:mvvm-state:0.10.1")
 
                 api("org.jetbrains.kotlinx:kotlinx-serialization-core:${serializationVersion}")
 

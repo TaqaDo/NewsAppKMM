@@ -1,5 +1,8 @@
 package com.example.newsappkmm.di
 
+import com.example.newsappkmm.core.coreModule
+import com.example.newsappkmm.data.dataModule
+import com.example.newsappkmm.viewModels.viewModelsModule
 import org.kodein.di.*
 import kotlin.native.concurrent.ThreadLocal
 
@@ -26,7 +29,10 @@ object NewsAppSDK {
 
         val direct = DI {
             importAll(
-                configurationModule
+                configurationModule,
+                coreModule,
+                dataModule,
+                viewModelsModule
             )
         }.direct
 

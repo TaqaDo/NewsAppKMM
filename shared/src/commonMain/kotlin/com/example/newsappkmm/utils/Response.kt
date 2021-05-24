@@ -1,7 +1,7 @@
 package com.example.newsappkmm.utils
 
 sealed class Response<out T> {
-    class Success<out T>(val data: T) : Response<T>()
+    data class Success<out T>(val data: T) : Response<T>()
     data class Error(val exception: Throwable,
                      val code: Int? = null,
                      val error: Boolean? = null,
